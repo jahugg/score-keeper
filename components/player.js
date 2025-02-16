@@ -3,7 +3,7 @@ class Player extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
 
-        fetch('/Users/jan/Documents/Code/score-keeper/components/player-template.html')
+        fetch('./components/player-template.html')
             .then(response => response.text())
             .then(templateContent => {
                 const template = document.createElement('template');
@@ -50,6 +50,10 @@ class Player extends HTMLElement {
 
         resizeInputs(nameInputs);
         resizeInputs(pointsInputs);
+    }
+
+    connectedCallback() {
+        // Initialization moved to initializeComponent method
     }
 }
 
