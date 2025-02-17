@@ -1,16 +1,18 @@
 <style>
   :host {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      font-size: 2em;
-      color: white;
-      align-items: center;
-      background: rgb(56, 55, 58);
-      padding: 1em;
-      border-radius: 5px;
+    --color: oklch(1 0 0 / 20%);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    font-size: 2em;
+    color: white;
+    align-items: center;
+    background: var(--color);
+    padding: 1em;
+    border-radius: 20px;
+    box-shadow: 0 0 10px 0 colormix(in oklch, var(--color) 80%, black); /* colormix not working? */
   }
-      
+
   /* Hide default number input steppers */
   input[type='number']::-webkit-outer-spin-button,
   input[type='number']::-webkit-inner-spin-button {
@@ -30,6 +32,7 @@
     color: inherit;
     background: oklch(1 0 0 / 10%);
     text-align: center;
+    transition: background 0.2s;
   }
 
   button {
@@ -42,12 +45,18 @@
   }
 
   .name {
-      margin-top: 1em;
+    margin-top: 1em;
     border-radius: 20px;
     min-width: 10ch;
+    outline: none;
+
+    &:focus {
+      background: oklch(1 0 0 / 23%);
+      outline: solid 2px oklch(1 0 0 / 40%);
+    }
   }
 
-  .points-wrapper {
+  .score-wrapper {
     display: flex;
     height: 100%;
     flex-direction: column;
@@ -55,7 +64,7 @@
     align-items: center;
   }
 
-  .points {
+  .score {
     background: none;
     min-width: 2ch;
     font-size: 3em;
@@ -68,10 +77,10 @@
   }
 </style>
 <input class="name" type="text" placeholder="Player A" />
-<div class="points-wrapper">
-    <input class="points" type="number" value="0" step="1" />
-    <div class="steppers">
+<div class="score-wrapper">
+  <input class="score" type="number" value="0" step="1" />
+  <div class="steppers">
     <button type="button" class="decrement">-</button>
     <button type="button" class="increment">+</button>
-    </div>
+  </div>
 </div>

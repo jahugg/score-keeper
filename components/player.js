@@ -1,60 +1,93 @@
 class Player extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
+  static colorChroma = 0.1142; // Shared colorChroma variable
+  static colorLightness = 69; // Shared colorLightness variable
 
-        fetch('./components/player-template.html')
-            .then(response => response.text())
-            .then(templateContent => {
-                const template = document.createElement('template');
-                template.innerHTML = templateContent;
-                this.shadowRoot.appendChild(template.content.cloneNode(true));
-                this.initializeComponent();
-            });
-    }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.loadTemplate();
 
-    initializeComponent() {
-        const decrementButton = this.shadowRoot.querySelector('.decrement');
-        const incrementButton = this.shadowRoot.querySelector('.increment');
-        const numberInput = this.shadowRoot.querySelector('.points');
+    this._name = '';
+    this._colorHue = '228';
+    this._score = 0;
+    this._placeholderName = 'Player Name';
+  }
 
-        const updateWidth = (input) => {
-            input.style.width = `${input.value.length + 1}ch`;
-        };
+  async loadTemplate() {
+    const response = await fetch('./components/player-template.html');
+    const templateContent = await response.text();
+    const template = document.createElement('template');
+    template.innerHTML = templateContent;
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    this.initializeComponent();
+  }
 
-        const updatePoints = (stepFunction) => {
-            stepFunction.call(numberInput);
-            updateWidth(numberInput);
-        };
+  initializeComponent() {
+    this.colorHue = this.getAttribute('data-color-hue') || 228;
+    this.placeholderName = this.getAttribute('data-placeholder-name') || 'Player Name';
 
-        decrementButton.addEventListener('click', () => {
-            updatePoints(numberInput.stepDown);
+    const decrementButton = this.shadowRoot.querySelector('.decrement');
+    const incrementButton = this.shadowRoot.querySelector('.increment');
+    const numberInput = this.shadowRoot.querySelector('.score');
+
+    const updateWidth = (input) => {
+      input.style.width = `${input.value.length + 1}ch`;
+    };
+
+    const updatePoints = (stepFunction) => {
+      stepFunction.call(numberInput);
+      updateWidth(numberInput);
+    };
+
+    decrementButton.addEventListener('click', () => {
+      updatePoints(numberInput.stepDown);
+    });
+
+    incrementButton.addEventListener('click', () => {
+      updatePoints(numberInput.stepUp);
+    });
+
+    const resizeInputs = (inputs) => {
+      inputs.forEach(input => {
+        updateWidth(input);
+
+        input.addEventListener('input', () => {
+          updateWidth(input);
         });
+      });
+    };
 
-        incrementButton.addEventListener('click', () => {
-            updatePoints(numberInput.stepUp);
-        });
+    const nameInputs = this.shadowRoot.querySelectorAll('.name');
+    const pointsInputs = this.shadowRoot.querySelectorAll('.score');
 
-        const resizeInputs = (inputs) => {
-            inputs.forEach(input => {
-                updateWidth(input);
+    resizeInputs(nameInputs);
+    resizeInputs(pointsInputs);
+  }
 
-                input.addEventListener('input', () => {
-                    updateWidth(input);
-                });
-            });
-        };
+  connectedCallback() {
+    // Initialization moved to initializeComponent method
+  }
 
-        const nameInputs = this.shadowRoot.querySelectorAll('.name');
-        const pointsInputs = this.shadowRoot.querySelectorAll('.points');
+  set score(value) {
+    this._score = value;
+    this.shadowRoot.querySelector('.score').value = this._score;
+  }
+  
+  set colorHue(value) {
+    this._colorHue = value;
+    let oklchColor = `oklch(${Player.colorLightness}% ${Player.colorChroma} ${this._colorHue})`;
+    this.style.setProperty('--color', oklchColor); // Set the custom property --color
+  }
 
-        resizeInputs(nameInputs);
-        resizeInputs(pointsInputs);
-    }
+  set name(value) {
+    this._name = value;
+    this.shadowRoot.querySelector('.name').value = this._name;
+  }
 
-    connectedCallback() {
-        // Initialization moved to initializeComponent method
-    }
+  set placeholderName(value) {
+    this._placeholderName = value;
+    this.shadowRoot.querySelector('.name').placeholder = this._placeholderName;
+  }
 }
 
 customElements.define('player-component', Player);
