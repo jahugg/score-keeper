@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addPlayer(`Player ${alphabet[i]}`, colorHues[i]);
     }
 
-    // Request wake lock
+    // Request wake lock to prevent screen sleeping
     requestWakeLock();
 });
 

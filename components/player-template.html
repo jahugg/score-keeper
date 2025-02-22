@@ -1,16 +1,19 @@
 <style>
   :host {
+    --padding: 20px;
     --color: oklch(1 0 0 / 20%);
     width: 100%;
+    flex: 1 1 min-content;
+    max-width: 400px;
     display: flex;
     flex-direction: column;
     font-size: 2em;
-    color: white;
     align-items: center;
-    background: var(--color);
+    color: white;
     border-radius: 20px;
-    box-shadow: 0 0 10px 0 colormix(in oklch, var(--color) 80%, black); /* colormix not working? */
-    padding: 30px;
+    background: var(--color);
+    box-shadow: 0 0 10px 0 colormix(in oklch, var(--color) 80%, black);
+    padding: 20px; /* this has no effect for some reason, workaround by setting individual margins */
   }
 
   /* Hide default number input steppers */
@@ -45,9 +48,14 @@
   }
 
   .name {
+    margin-top: var(--padding);
     border-radius: 9999px;
     min-width: 10ch;
     outline: none;
+
+    &::placeholder {
+      color: oklch(100% 0 360 / 50%);
+    }
 
     &:focus {
       background: oklch(1 0 0 / 23%);
@@ -56,6 +64,8 @@
   }
 
   .score-wrapper {
+
+    margin-bottom: var(--padding);
     display: flex;
     height: 100%;
     flex-direction: column;

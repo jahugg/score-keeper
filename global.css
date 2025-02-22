@@ -6,8 +6,11 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
+  overflow: hidden;
+  height: 100%;
   margin: 0;
+  padding: 0;
 }
 
 #app {
@@ -26,6 +29,5 @@ body {
   align-items: center;
   height: 100%;
   width: 100%;
-  padding: var(--padding);
   gap: var(--padding);
 }
