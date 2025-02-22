@@ -8,9 +8,9 @@
     color: white;
     align-items: center;
     background: var(--color);
-    padding: 1em;
     border-radius: 20px;
     box-shadow: 0 0 10px 0 colormix(in oklch, var(--color) 80%, black); /* colormix not working? */
+    padding: 30px;
   }
 
   /* Hide default number input steppers */
@@ -45,8 +45,7 @@
   }
 
   .name {
-    margin-top: 1em;
-    border-radius: 20px;
+    border-radius: 9999px;
     min-width: 10ch;
     outline: none;
 
@@ -62,20 +61,21 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-  }
 
-  .score {
-    background: none;
-    min-width: 2ch;
-    font-size: 3em;
-  }
+    & .score {
+      background: none;
+      min-width: 2ch;
+      font-size: 3em;
+    }
 
-  .steppers {
-    display: flex;
-    justify-content: center;
-    gap: 1em;
+    & .steppers {
+      display: flex;
+      justify-content: center;
+      gap: 1em;
+    }
   }
 </style>
+
 <input class="name" type="text" placeholder="Player A" />
 <div class="score-wrapper">
   <input class="score" type="number" value="0" step="1" />

@@ -1,4 +1,6 @@
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -12,10 +14,17 @@ body {
   background: oklch(22% 0 0);
 }
 
+#app-main {
+  height: 100vh;
+}
+
 .players {
   --padding: 10px;
   display: flex;
-  height: 100vh;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
   width: 100%;
   padding: var(--padding);
   gap: var(--padding);
