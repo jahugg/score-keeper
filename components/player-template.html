@@ -2,6 +2,7 @@
   :host {
     --padding: 20px;
     --color: oklch(1 0 0 / 20%);
+    position: relative;
     width: 100%;
     flex: 1 1 min-content;
     max-width: 400px;
@@ -36,14 +37,14 @@
     background: oklch(1 0 0 / 10%);
     text-align: center;
     transition: background 0.2s;
-    -webkit-tap-highlight-color: transparent; /* Remove the default blue highlight */
+    -webkit-tap-highlight-color: transparent; /* Remove the default blue highlight on tap */
 
-    &:active{
-        background: oklch(1 0 0 / 20%);
+    &:active {
+      background: oklch(1 0 0 / 20%);
     }
   }
 
-  button {
+  .change-btn {
     --size: 80px;
     border-radius: 9999px;
     height: var(--size);
@@ -67,9 +68,23 @@
       outline: solid 2px oklch(1 0 0 / 40%);
     }
   }
+  .cycle-color-btn {
+    --size: 30px;
+    position: absolute;
+    display: block;
+    top: 10px;
+    right: 10px;
+    height: var(--size);
+    width: var(--size);
+    border-radius: var(--size);
+    background: oklch(0 0 0 / 20%);
+
+    &:active {
+      background: oklch(0 0 0 / 30%);
+    }
+  }
 
   .score-wrapper {
-
     margin-bottom: var(--padding);
     display: flex;
     height: 100%;
@@ -95,7 +110,8 @@
 <div class="score-wrapper">
   <input class="score" type="number" value="0" step="1" />
   <div class="steppers">
-    <button type="button" class="decrement">-</button>
-    <button type="button" class="increment">+</button>
+    <button type="button" class="change-btn decrement">-</button>
+    <button type="button" class="change-btn increment">+</button>
   </div>
 </div>
+<button type="button" class="cycle-color-btn"></button>

@@ -1,6 +1,8 @@
 class Player extends HTMLElement {
-  static colorChroma = 0.1142; // Shared colorChroma variable
-  static colorLightness = 69; // Shared colorLightness variable
+  // Shared variables
+  static colorChroma = 0.1142;
+  static colorLightness = 69;
+  static colorHues = [0, 36, 72, 108, 144, 180, 216, 252, 288, 324];
 
   constructor() {
     super();
@@ -8,7 +10,7 @@ class Player extends HTMLElement {
     this.loadTemplate();
 
     this._name = '';
-    this._colorHue = '228';
+    this._colorHue = 0;
     this._score = 0;
     this._placeholderName = 'Player Name';
   }
@@ -23,12 +25,21 @@ class Player extends HTMLElement {
   }
 
   initializeComponent() {
-    this.colorHue = this.getAttribute('data-color-hue') || 228;
+
+    // set random initial color from array
+    const randomIndex = Math.floor(Math.random() * Player.colorHues.length);
+    this.colorHue = Player.colorHues[randomIndex];
+
+    // set placeholder name
     this.placeholderName = this.getAttribute('data-placeholder-name') || 'Player Name';
 
     const decrementButton = this.shadowRoot.querySelector('.decrement');
     const incrementButton = this.shadowRoot.querySelector('.increment');
     const numberInput = this.shadowRoot.querySelector('.score');
+
+    // init cycle color button
+    const colorCycleButton = this.shadowRoot.querySelector(".cycle-color-btn")
+    colorCycleButton.addEventListener("click", (event) => { this.cycleColor() });
 
     const updateWidth = (input) => {
       input.style.width = `${input.value.length + 1}ch`;
@@ -68,11 +79,18 @@ class Player extends HTMLElement {
     // Initialization moved to initializeComponent method
   }
 
+  cycleColor() {
+    const currentIndex = Player.colorHues.indexOf(Number(this._colorHue));
+    // Calculate the next index, wrapping around to the start of the array if necessary
+    const nextIndex = (currentIndex + 1) % Player.colorHues.length;
+    this.colorHue = Player.colorHues[nextIndex];
+  }
+
   set score(value) {
     this._score = value;
     this.shadowRoot.querySelector('.score').value = this._score;
   }
-  
+
   set colorHue(value) {
     this._colorHue = value;
     let oklchColor = `oklch(${Player.colorLightness}% ${Player.colorChroma} ${this._colorHue})`;
