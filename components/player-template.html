@@ -14,7 +14,8 @@
     border-radius: 20px;
     background: var(--color);
     box-shadow: 0 0 10px 0 colormix(in oklch, var(--color) 80%, black);
-    padding: 20px; /* this has no effect for some reason, workaround by setting individual margins */
+    padding: 20px;
+    /* this has no effect for some reason, workaround by setting individual margins */
   }
 
   /* Hide default number input steppers */
@@ -37,7 +38,8 @@
     background: oklch(1 0 0 / 10%);
     text-align: center;
     transition: background 0.2s;
-    -webkit-tap-highlight-color: transparent; /* Remove the default blue highlight on tap */
+    -webkit-tap-highlight-color: transparent;
+    /* Remove the default blue highlight on tap */
 
     &:active {
       background: oklch(1 0 0 / 20%);
@@ -68,6 +70,7 @@
       outline: solid 2px oklch(1 0 0 / 40%);
     }
   }
+
   .cycle-color-btn {
     --size: 30px;
     position: absolute;
@@ -103,12 +106,47 @@
       justify-content: center;
       gap: 1em;
     }
+
+    & .click-counter {
+      flex-direction: column;
+      align-items: center;
+      position: absolute;
+      background: oklch(1 0 0 / 10%);
+      border-radius: 3px;
+      overflow: hidden;
+      width: 100px;
+
+      & .timeout-progress {
+        appearance: none;
+        display: block;
+        border: none;
+        background: oklch(1 0 0 / 10%);
+        height: 4px;
+        width: 100%;
+
+        &::-webkit-progress-value {
+          background: oklch(1 0 0 / 60%); /* Changed indicator color to greenish */
+        }
+
+        &::-moz-progress-bar {
+          background: oklch(1 0 0 / 60%); /* Changed indicator color to greenish */
+        }
+
+        &::-ms-fill {
+          background: oklch(1 0 0 / 60%); /* Changed indicator color to greenish */
+        }
+      }
+    }
   }
 </style>
 
 <input class="name" type="text" placeholder="Player A" />
 <div class="score-wrapper">
   <input class="score" type="number" value="0" step="1" />
+  <div class="click-counter" hidden>
+    <span class="click-count">0</span>
+    <progress class="timeout-progress" value="0" max="100"></progress>
+  </div>
   <div class="steppers">
     <button type="button" class="change-btn decrement">-</button>
     <button type="button" class="change-btn increment">+</button>

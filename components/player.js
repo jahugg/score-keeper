@@ -33,37 +33,20 @@ class Player extends HTMLElement {
     // set placeholder name
     this.placeholderName = this.getAttribute('data-placeholder-name') || 'Player Name';
 
-    const decrementButton = this.shadowRoot.querySelector('.decrement');
-    const incrementButton = this.shadowRoot.querySelector('.increment');
-    const numberInput = this.shadowRoot.querySelector('.score');
-
-    // init cycle color button
+    // add cycle color button
     const colorCycleButton = this.shadowRoot.querySelector(".cycle-color-btn")
     colorCycleButton.addEventListener("click", (event) => { this.cycleColor() });
 
-    const updateWidth = (input) => {
+    const updateInputWidth = (input) => {
       input.style.width = `${input.value.length + 1}ch`;
     };
 
-    const updatePoints = (stepFunction) => {
-      stepFunction.call(numberInput);
-      updateWidth(numberInput);
-    };
-
-    decrementButton.addEventListener('click', () => {
-      updatePoints(numberInput.stepDown);
-    });
-
-    incrementButton.addEventListener('click', () => {
-      updatePoints(numberInput.stepUp);
-    });
-
     const resizeInputs = (inputs) => {
       inputs.forEach(input => {
-        updateWidth(input);
+        updateInputWidth(input);
 
         input.addEventListener('input', () => {
-          updateWidth(input);
+          updateInputWidth(input);
         });
       });
     };
@@ -73,6 +56,9 @@ class Player extends HTMLElement {
 
     resizeInputs(nameInputs);
     resizeInputs(pointsInputs);
+
+    // initialize the point button handling
+    this.handlePointButtonClicks();
   }
 
   connectedCallback() {
@@ -106,6 +92,63 @@ class Player extends HTMLElement {
     this._placeholderName = value;
     this.shadowRoot.querySelector('.name').placeholder = this._placeholderName;
   }
+
+  handlePointButtonClicks() {
+    let clickCount = 0;
+    let timeout;
+    const changeDelay = 1000; // Delay in milliseconds
+
+    const incrementButton = this.shadowRoot.querySelector('.increment');
+    const decrementButton = this.shadowRoot.querySelector('.decrement');
+
+    const updateInputWidth = (input) => {
+      input.style.width = `${input.value.length + 1}ch`;
+    };
+
+    const handleButtonClick = (type) => {
+      clickCount += type === 'increment' ? 1 : -1;
+      clearTimeout(timeout);
+
+      // Display click counter with click count
+      let clickCounterEl = this.shadowRoot.querySelector('.click-counter');
+      let clickCountEl = this.shadowRoot.querySelector('.click-count');
+      let progressBar = this.shadowRoot.querySelector('.timeout-progress');
+
+      if (clickCounterEl.hasAttribute('hidden')) {
+        clickCounterEl.removeAttribute('hidden');
+        clickCounterEl.style.display = 'flex';
+      }
+      clickCountEl.innerText = clickCount > 0 ? `+${clickCount}` : `${clickCount}`;
+
+      // Reset progress bar
+      progressBar.value = 0;
+      const startTime = performance.now();
+      const updateProgress = (currentTime) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min((elapsed / changeDelay) * 100, 100);
+        progressBar.value = progress;
+
+        if (elapsed < changeDelay) {
+          requestAnimationFrame(updateProgress);
+        }
+      };
+
+      requestAnimationFrame(updateProgress);
+
+      // Process accumulated clicks after a short delay
+      timeout = setTimeout(() => {
+        const numberInput = this.shadowRoot.querySelector('.score');
+        numberInput.value = parseInt(numberInput.value) + clickCount;
+        updateInputWidth(numberInput);
+        clickCount = 0;
+        clickCounterEl.setAttribute('hidden', '');
+        clickCounterEl.style.display = 'none';
+      }, changeDelay);
+    };
+
+    incrementButton.addEventListener('pointerup', () => handleButtonClick('increment'));
+    decrementButton.addEventListener('pointerup', () => handleButtonClick('decrement'));
+  };
 }
 
 customElements.define('player-component', Player);
