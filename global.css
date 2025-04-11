@@ -6,15 +6,21 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   overflow: hidden;
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
+:root {
+  --font-family: 'Inter', sans-serif;
+}
+
 #app {
   background: oklch(22% 0 0);
+  font-family: var(--font-family);
 }
 
 #app-main {

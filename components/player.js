@@ -120,6 +120,8 @@ class Player extends HTMLElement {
       }
       clickCountEl.innerText = clickCount > 0 ? `+${clickCount}` : `${clickCount}`;
 
+      this.restartAnimation(clickCounterEl, 'animate-pop');
+
       // Reset progress bar
       progressBar.value = 0;
       const startTime = performance.now();
@@ -141,14 +143,31 @@ class Player extends HTMLElement {
         numberInput.value = parseInt(numberInput.value) + clickCount;
         updateInputWidth(numberInput);
         clickCount = 0;
-        clickCounterEl.setAttribute('hidden', '');
-        clickCounterEl.style.display = 'none';
+        this.restartAnimation(clickCounterEl, 'animate-apply');
       }, changeDelay);
+
+      clickCounterEl.addEventListener('animationend', (event) => {
+        if (event.animationName === 'apply') {
+          clickCounterEl.classList.remove('animate-apply');
+          clickCounterEl.setAttribute('hidden', '');
+          clickCounterEl.style.display = 'none';
+
+          // Reset attributes applied by the animation
+          clickCounterEl.style.transform = '';
+          clickCounterEl.style.opacity = '';
+        }
+      });
     };
 
     incrementButton.addEventListener('pointerup', () => handleButtonClick('increment'));
     decrementButton.addEventListener('pointerup', () => handleButtonClick('decrement'));
   };
+
+  restartAnimation(el, className) {
+    el.classList.remove(className);
+    void el.offsetWidth;  // Trigger reflow
+    el.classList.add(className);
+  }
 }
 
 customElements.define('player-component', Player);
