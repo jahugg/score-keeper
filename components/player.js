@@ -72,22 +72,44 @@ class Player extends HTMLElement {
     this.colorHue = Player.colorHues[nextIndex];
   }
 
+  /**
+   * @param {number} value
+   */
   set score(value) {
+    const delta = value - this._score;
+    console.log(delta);
     this._score = value;
     this.shadowRoot.querySelector('.score').value = this._score;
+
+    // create a new dom element displaying the delta value
+    const deltaEl = document.createElement('div');
+    deltaEl.classList.add('delta');
+    deltaEl.innerText = delta > 0 ? `+${delta}` : `${delta}`;
+    
+    const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
+    scoreHistoryEl.appendChild(deltaEl);
   }
 
+  /**
+   * @param {number} value
+   */
   set colorHue(value) {
     this._colorHue = value;
     let oklchColor = `oklch(${Player.colorLightness}% ${Player.colorChroma} ${this._colorHue})`;
     this.style.setProperty('--color', oklchColor); // Set the custom property --color
   }
 
+  /**
+   * @param {string} value
+   */
   set name(value) {
     this._name = value;
     this.shadowRoot.querySelector('.name').value = this._name;
   }
 
+  /**
+   * @param {string} value
+   */
   set placeholderName(value) {
     this._placeholderName = value;
     this.shadowRoot.querySelector('.name').placeholder = this._placeholderName;
@@ -100,10 +122,6 @@ class Player extends HTMLElement {
 
     const incrementButton = this.shadowRoot.querySelector('.increment');
     const decrementButton = this.shadowRoot.querySelector('.decrement');
-
-    const updateInputWidth = (input) => {
-      input.style.width = `${input.value.length + 1}ch`;
-    };
 
     const handleButtonClick = (type) => {
       clickCount += type === 'increment' ? 1 : -1;
@@ -139,9 +157,7 @@ class Player extends HTMLElement {
 
       // Process accumulated clicks after a short delay
       timeout = setTimeout(() => {
-        const numberInput = this.shadowRoot.querySelector('.score');
-        numberInput.value = parseInt(numberInput.value) + clickCount;
-        updateInputWidth(numberInput);
+        this.adjustScore(clickCount);
         clickCount = 0;
         this.restartAnimation(clickCounterEl, 'animate-apply');
       }, changeDelay);
@@ -162,6 +178,10 @@ class Player extends HTMLElement {
     incrementButton.addEventListener('pointerup', () => handleButtonClick('increment'));
     decrementButton.addEventListener('pointerup', () => handleButtonClick('decrement'));
   };
+
+  adjustScore(delta) {
+    this.score = this._score + delta;
+  }
 
   restartAnimation(el, className) {
     el.classList.remove(className);

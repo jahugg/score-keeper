@@ -2,7 +2,7 @@
   :host {
     --padding: 20px;
     --color: oklch(1 0 0 / 20%);
-    
+
     font-family: var(--font-family);
     position: relative;
     width: 100%;
@@ -131,6 +131,10 @@
     align-items: center;
     position: relative;
 
+    & .score-history {
+      display: flex;
+    }
+
     & .score {
       background: none;
       min-width: 2ch;
@@ -180,7 +184,9 @@
 
 <input class="name" type="text" placeholder="Player A" />
 <div class="score-wrapper">
-  <input class="score" type="number" value="0" step="1" />
+  <div class="score-history">
+    <input class="score" type="number" value="0" step="1" />
+  </div>
   <div class="click-counter" hidden>
     <span class="click-count">0</span>
     <progress class="timeout-progress" value="0" max="100"></progress>
