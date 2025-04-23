@@ -35,27 +35,7 @@ class Player extends HTMLElement {
 
     // add cycle color button
     const colorCycleButton = this.shadowRoot.querySelector(".cycle-color-btn")
-    colorCycleButton.addEventListener("click", (event) => { this.cycleColor() });
-
-    const updateInputWidth = (input) => {
-      input.style.width = `${input.value.length + 1}ch`;
-    };
-
-    const resizeInputs = (inputs) => {
-      inputs.forEach(input => {
-        updateInputWidth(input);
-
-        input.addEventListener('input', () => {
-          updateInputWidth(input);
-        });
-      });
-    };
-
-    const nameInputs = this.shadowRoot.querySelectorAll('.name');
-    const pointsInputs = this.shadowRoot.querySelectorAll('.score');
-
-    resizeInputs(nameInputs);
-    resizeInputs(pointsInputs);
+    colorCycleButton.addEventListener("pointerup", (event) => { this.cycleColor() });
 
     // initialize the point button handling
     this.handlePointButtonClicks();
@@ -77,17 +57,30 @@ class Player extends HTMLElement {
    */
   set score(value) {
     const delta = value - this._score;
-    console.log(delta);
     this._score = value;
+
+    const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
     this.shadowRoot.querySelector('.score').value = this._score;
 
-    // create a new dom element displaying the delta value
+    //remove current classes from all elements with score class
+    const currentScoreEls = scoreHistoryEl.querySelectorAll('.score.current');
+    currentScoreEls.forEach((el) => {
+      el.classList.remove('current');
+    }
+    );
+
+    // add current score element to history
+    const currentScoreEl = document.createElement('div');
+    currentScoreEl.classList.add('score', 'current');
+    currentScoreEl.innerText = this._score;
+    scoreHistoryEl.appendChild(currentScoreEl);
+
+    // add delta element to history
     const deltaEl = document.createElement('div');
     deltaEl.classList.add('delta');
     deltaEl.innerText = delta > 0 ? `+${delta}` : `${delta}`;
-    
-    const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
-    scoreHistoryEl.appendChild(deltaEl);
+    currentScoreEl.appendChild(deltaEl);
+
   }
 
   /**

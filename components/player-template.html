@@ -125,20 +125,37 @@
   .score-wrapper {
     margin-bottom: var(--padding);
     display: flex;
-    height: 100%;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
+    width: 100%;
+    border: solid 1px red;
 
     & .score-history {
       display: flex;
-    }
+      align-items: first baseline;
+      border: solid 1px red;
+      gap: 1em;
+      overflow: auto;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
 
-    & .score {
-      background: none;
-      min-width: 2ch;
-      font-size: 3em;
+      & .score {
+        background: none;
+        font-size: 2em;
+        position: relative;
+        border: solid 1px green;
+        scroll-snap-align: center;
+
+        &.current {
+          font-size: 3em;
+        }
+
+        & .delta {
+          position: absolute;
+          bottom: 0;
+          left: -30px;
+          font-size: 1.5rem;
+        }
+      }
     }
 
     & .steppers {
@@ -185,7 +202,7 @@
 <input class="name" type="text" placeholder="Player A" />
 <div class="score-wrapper">
   <div class="score-history">
-    <input class="score" type="number" value="0" step="1" />
+    <div class="score current">0</div>
   </div>
   <div class="click-counter" hidden>
     <span class="click-count">0</span>
