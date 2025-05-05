@@ -1,7 +1,7 @@
 class Player extends HTMLElement {
   // Shared variables
-  static colorChroma = 0.1142;
   static colorLightness = 69;
+  static colorChroma = 0.1142;
   static colorHues = [0, 36, 72, 108, 144, 180, 216, 252, 288, 324];
 
   constructor() {
@@ -88,8 +88,9 @@ class Player extends HTMLElement {
    */
   set colorHue(value) {
     this._colorHue = value;
-    let oklchColor = `oklch(${Player.colorLightness}% ${Player.colorChroma} ${this._colorHue})`;
-    this.style.setProperty('--color', oklchColor); // Set the custom property --color
+    this.style.setProperty('--color-player-lightness', `${Player.colorLightness}%`); // Set the custom property --color-player
+    this.style.setProperty('--color-player-chroma', Player.colorChroma); // Set the custom property --color-player
+    this.style.setProperty('--color-player-hue', this._colorHue); // Set the custom property --color-player
   }
 
   /**

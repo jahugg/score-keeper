@@ -1,7 +1,35 @@
 <style>
   :host {
-    --padding: 20px;
-    --color: oklch(1 0 0 / 20%);
+    --padding-m: 20px;
+
+    /* descriptive colors */
+    --color-player-lightness: 69%;
+    --color-player-chroma: 0.1142;
+    --color-player-hue: 0;
+
+    --color-player: oklch(var(--color-player-lightness) var(--color-player-chroma) var(--color-player-hue));
+    --color-player-fade1: oklch(73% var(--color-player-chroma) var(--color-player-hue));
+    --color-player-fade2: oklch(77% var(--color-player-chroma) var(--color-player-hue));
+    --color-player-fade3: oklch(85% var(--color-player-chroma) var(--color-player-hue));
+    --color-white: oklch(100% 0 0);
+    --color-grey-90: oklch(90% 0 0);
+    --color-grey-80: oklch(80% 0 0);
+    --color-black: oklch(0% 0 0);
+
+    /* semantic colors */
+    --color-background-default: var(--color-player);
+    --color-background-inverted: var(--color-white);
+    --color-background-input: var(--color-player-fade1);
+    --color-background-input-active: var(--color-player-fade2);
+    --color-text-default: var(--color-white);
+    --color-text-inverted: var(--color-black);
+    --color-text-placeholder: var(--color-player-fade3);
+    --color-outline: var(--color-player-fade3);
+    --color-progressbar:var(--color-grey-90);
+    --color-progress: var(--color-grey-80);
+
+    /* outlines */
+    --outline-default: solid 2px var(--color-outline);
 
     font-family: var(--font-family);
     position: relative;
@@ -12,11 +40,11 @@
     flex-direction: column;
     font-size: 2em;
     align-items: center;
-    color: white;
+    color: var(--color-text-default);
     border-radius: 20px;
-    background: var(--color);
-    box-shadow: 0 0 10px 0 colormix(in oklch, var(--color) 80%, black);
-    padding: 20px;
+    background: var(--color-player);
+    box-shadow: 0 0 10px 0 colormix(in oklch, var(--color-player) 80%, black);
+    padding: var(--padding-m);
     /* this has no effect for some reason, workaround by setting individual margins */
   }
 
@@ -71,18 +99,31 @@
     font: inherit;
     border: none;
     color: inherit;
-    background: oklch(1 0 0 / 10%);
+    background: var(--color-background-input);
     text-align: center;
     transition: background 0.2s;
     -webkit-tap-highlight-color: transparent;
 
     &:active {
-      background: oklch(1 0 0 / 20%);
+      background: var(--color-background-input-active);
+    }
+  }
+
+  input {
+
+    &:focus {
+      background: var(--color-background-input-active);
+      outline: var(--outline-default);
+    }
+
+    &::placeholder {
+      color: var(--color-text-placeholder);
     }
   }
 
   .change-btn {
     --size: 80px;
+
     border-radius: 9999px;
     height: var(--size);
     width: var(--size);
@@ -91,48 +132,33 @@
   }
 
   .name {
-    margin-top: var(--padding);
     border-radius: 9999px;
     min-width: 10ch;
     outline: none;
-
-    &::placeholder {
-      color: oklch(100% 0 360 / 50%);
-    }
-
-    &:focus {
-      background: oklch(1 0 0 / 23%);
-      outline: solid 2px oklch(1 0 0 / 40%);
-    }
   }
 
   .cycle-color-btn {
     --size: 30px;
+    --offset: 10px;
+
     position: absolute;
     display: block;
-    top: 10px;
-    right: 10px;
+    top: var(--offset);
+    right: var(--offset);
     height: var(--size);
     width: var(--size);
     border-radius: var(--size);
     background: oklch(0 0 0 / 20%);
-
-    &:active {
-      background: oklch(0 0 0 / 30%);
-    }
   }
 
   .score-wrapper {
-    margin-bottom: var(--padding);
     display: flex;
     flex-direction: column;
     width: 100%;
-    border: solid 1px red;
 
     & .score-history {
       display: flex;
       align-items: first baseline;
-      border: solid 1px red;
       gap: 1em;
       overflow: auto;
       scroll-snap-type: x mandatory;
@@ -142,7 +168,6 @@
         background: none;
         font-size: 2em;
         position: relative;
-        border: solid 1px green;
         scroll-snap-align: center;
 
         &.current {
@@ -169,8 +194,8 @@
       align-items: center;
       position: absolute;
       top: 50%;
-      background: oklch(1 0 0 / 100%);
-      color: black;
+      background: var(--color-background-inverted);
+      color: var(--color-text-inverted);
       border-radius: 3px;
       overflow: hidden;
       width: 70px;
@@ -179,20 +204,20 @@
         appearance: none;
         display: block;
         border: none;
-        background: oklch(0.9 0 0);
+        background: var(--color-progressbar);
         height: 4px;
         width: 100%;
 
         &::-webkit-progress-value {
-          background: oklch(0.8 0 0);
+          background: var(--color-progress);
         }
 
         &::-moz-progress-bar {
-          background: oklch(0.8 0 0);
+          background: var(--color-progress);
         }
 
         &::-ms-fill {
-          background: oklch(0.8 0 0);
+          background: var(--color-progress);
         }
       }
     }
