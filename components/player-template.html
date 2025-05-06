@@ -1,4 +1,11 @@
 <style>
+  :host,
+  :host *,
+  :host *::before,
+  :host *::after {
+    box-sizing: border-box;
+  }
+
   :host {
     --padding-m: 20px;
 
@@ -23,13 +30,16 @@
     --color-background-input-active: var(--color-player-fade2);
     --color-text-default: var(--color-white);
     --color-text-inverted: var(--color-black);
-    --color-text-placeholder: var(--color-player-fade3);
+    --color-text-subtle: var(--color-player-fade3);
     --color-outline: var(--color-player-fade3);
-    --color-progressbar:var(--color-grey-90);
+    --color-progressbar: var(--color-grey-90);
     --color-progress: var(--color-grey-80);
 
-    /* outlines */
-    --outline-default: solid 2px var(--color-outline);
+    /* borders */
+    --border-default: solid 2px var(--color-outline);
+    $
+    /* fonts */
+    /* --font-regular etc here... */
 
     font-family: var(--font-family);
     position: relative;
@@ -39,13 +49,11 @@
     display: flex;
     flex-direction: column;
     font-size: 2em;
-    align-items: center;
     color: var(--color-text-default);
     border-radius: 20px;
     background: var(--color-player);
     box-shadow: 0 0 10px 0 colormix(in oklch, var(--color-player) 80%, black);
-    padding: var(--padding-m);
-    /* this has no effect for some reason, workaround by setting individual margins */
+    overflow: hidden;
   }
 
   @keyframes pop {
@@ -82,24 +90,12 @@
     animation: apply 0.4s ease-out forwards;
   }
 
-  /* Hide default number input steppers */
-  input[type='number']::-webkit-outer-spin-button,
-  input[type='number']::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  input[type='number'] {
-    appearance: textfield;
-    -moz-appearance: textfield;
-  }
-
   input,
   button {
     font: inherit;
-    border: none;
     color: inherit;
     background: var(--color-background-input);
+    border: none;
     text-align: center;
     transition: background 0.2s;
     -webkit-tap-highlight-color: transparent;
@@ -109,66 +105,50 @@
     }
   }
 
-  input {
+  .name {
+    outline: none;
+    padding: .6em 1em .4em 1em;
 
     &:focus {
       background: var(--color-background-input-active);
-      outline: var(--outline-default);
+      outline: var(--border-default);
     }
 
     &::placeholder {
-      color: var(--color-text-placeholder);
+      color: var(--color-text-subtle);
     }
-  }
-
-  .change-btn {
-    --size: 80px;
-
-    border-radius: 9999px;
-    height: var(--size);
-    width: var(--size);
-    aspect-ratio: 1 / 1;
-    cursor: pointer;
-  }
-
-  .name {
-    border-radius: 9999px;
-    min-width: 10ch;
-    outline: none;
-  }
-
-  .cycle-color-btn {
-    --size: 30px;
-    --offset: 10px;
-
-    position: absolute;
-    display: block;
-    top: var(--offset);
-    right: var(--offset);
-    height: var(--size);
-    width: var(--size);
-    border-radius: var(--size);
-    background: oklch(0 0 0 / 20%);
   }
 
   .score-wrapper {
     display: flex;
     flex-direction: column;
     width: 100%;
+    padding: var(--padding-m);
+    padding-top: 0;
 
     & .score-history {
+      --gap: 1em;
+      --height: 3em;
+
+      height: 3em;
       display: flex;
-      align-items: first baseline;
-      gap: 1em;
+      flex-direction: column;
+      align-items: center;
       overflow: auto;
-      scroll-snap-type: x mandatory;
-      overscroll-behavior-x: contain;
+      scroll-snap-type: y mandatory;
+      overscroll-behavior-y: contain;
+      scroll-behavior: smooth;
 
       & .score {
+        flex: 0 0 100px;
+        width: 100%;
+        text-align: center;
         background: none;
         font-size: 2em;
         position: relative;
         scroll-snap-align: center;
+        line-height: 100px;
+        position: relative;
 
         &.current {
           font-size: 3em;
@@ -176,9 +156,10 @@
 
         & .delta {
           position: absolute;
-          bottom: 0;
-          left: -30px;
+          top: 0;
+          right: 0;
           font-size: 1.5rem;
+          color: var(--color-text-subtle)
         }
       }
     }
@@ -187,6 +168,16 @@
       display: flex;
       justify-content: center;
       gap: 1em;
+
+      & button {
+        --size: 80px;
+
+        border-radius: 9999px;
+        height: var(--size);
+        width: var(--size);
+        aspect-ratio: 1 / 1;
+        cursor: pointer;
+      }
     }
 
     & .click-counter {
@@ -222,9 +213,24 @@
       }
     }
   }
+
+  .cycle-color-btn {
+    --size: 30px;
+    --offset: 10px;
+
+    position: absolute;
+    /* display: block; */
+    display: none;
+    top: var(--offset);
+    right: var(--offset);
+    height: var(--size);
+    width: var(--size);
+    border-radius: var(--size);
+    background: oklch(0 0 0 / 20%);
+  }
 </style>
 
-<input class="name" type="text" placeholder="Player A" />
+<input class="name" type="text" placeholder="Player A" maxlength="10" />
 <div class="score-wrapper">
   <div class="score-history">
     <div class="score current">0</div>
@@ -234,8 +240,8 @@
     <progress class="timeout-progress" value="0" max="100"></progress>
   </div>
   <div class="steppers">
-    <button type="button" class="change-btn decrement">-</button>
-    <button type="button" class="change-btn increment">+</button>
+    <button type="button" class="decrement">-</button>
+    <button type="button" class="increment">+</button>
   </div>
 </div>
 <button type="button" class="cycle-color-btn"></button>

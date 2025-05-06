@@ -62,7 +62,7 @@ class Player extends HTMLElement {
     const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
     this.shadowRoot.querySelector('.score').value = this._score;
 
-    //remove current classes from all elements with score class
+    // remove current classes from all elements with score class
     const currentScoreEls = scoreHistoryEl.querySelectorAll('.score.current');
     currentScoreEls.forEach((el) => {
       el.classList.remove('current');
@@ -75,11 +75,14 @@ class Player extends HTMLElement {
     currentScoreEl.innerText = this._score;
     scoreHistoryEl.appendChild(currentScoreEl);
 
-    // add delta element to history
+    // add delta element to previous score
     const deltaEl = document.createElement('div');
     deltaEl.classList.add('delta');
     deltaEl.innerText = delta > 0 ? `+${delta}` : `${delta}`;
     currentScoreEl.appendChild(deltaEl);
+
+    // Scroll to the bottom
+    scoreHistoryEl.scrollTop = scoreHistoryEl.scrollHeight;
 
   }
 
