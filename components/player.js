@@ -39,6 +39,17 @@ class Player extends HTMLElement {
 
     // initialize the point button handling
     this.handlePointButtonClicks();
+
+    // hide/show the steppers
+    const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
+    scoreHistoryEl.addEventListener('pointerup', (event) => {
+      const steppersEl = this.shadowRoot.querySelector('.steppers');
+      const isHidden = steppersEl.hasAttribute('data-hidden');
+      if (isHidden)
+        steppersEl.removeAttribute('data-hidden');
+      else
+        steppersEl.setAttribute('data-hidden', '');
+    });
   }
 
   connectedCallback() {
@@ -66,8 +77,7 @@ class Player extends HTMLElement {
     const currentScoreEls = scoreHistoryEl.querySelectorAll('.score.current');
     currentScoreEls.forEach((el) => {
       el.classList.remove('current');
-    }
-    );
+    });
 
     // add current score element to history
     const currentScoreEl = document.createElement('div');
@@ -83,6 +93,12 @@ class Player extends HTMLElement {
 
     // Scroll to the bottom
     scoreHistoryEl.scrollTop = scoreHistoryEl.scrollHeight;
+
+    // hide steppers
+    const steppersEl = this.shadowRoot.querySelector('.steppers');
+    if (!steppersEl.hasAttribute('data-hidden')) {
+      steppersEl.setAttribute('data-hidden', '');
+    }
 
   }
 
