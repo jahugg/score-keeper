@@ -23,12 +23,14 @@
     --color-grey-90: oklch(90% 0 0);
     --color-grey-80: oklch(80% 0 0);
     --color-black: oklch(0% 0 0);
+    --color-white-alpha: oklch(100% 0 0 / 0.2);
 
     /* semantic colors */
     --color-background-default: var(--color-player);
     --color-background-inverted: var(--color-white);
     --color-background-input: var(--color-player-fade1);
     --color-background-input-active: var(--color-player-fade2);
+    --color-background-slider: var(--color-white-alpha);
     --color-text-default: var(--color-white);
     --color-text-inverted: var(--color-black);
     --color-text-subtle: var(--color-player-fade3);
@@ -48,14 +50,19 @@
     width: 100%;
     flex: 1 1 min-content;
     max-width: 400px;
-    display: flex;
-    flex-direction: column;
     font-size: 2em;
     color: var(--color-text-default);
     border-radius: 20px;
     background: var(--color-player);
     box-shadow: 0 0 10px 0 colormix(in oklch, var(--color-player) 80%, black);
     overflow: hidden;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "header"
+      "body";
   }
 
   @keyframes pop {
@@ -108,6 +115,8 @@
   }
 
   .name {
+    grid-area: header;
+    width: 100%;
     outline: none;
     padding: .6em 1em .4em 1em;
 
@@ -121,120 +130,163 @@
     }
   }
 
-  .score-wrapper {
-    display: grid;
-    grid-template-areas: "stack";
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
+  .score-history {
+    --gap: 1em;
+    --height: 200px;
+
+    grid-area: body;
+    height: var(--height);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: auto;
+    scroll-snap-type: y mandatory;
+    overscroll-behavior-y: contain;
+    scroll-behavior: smooth;
     position: relative;
-    width: 100%;
 
-    & .score-history {
-      --gap: 1em;
-      --height: 200px;
-
-      grid-area: stack;
-      height: var(--height);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow: auto;
-      scroll-snap-type: y mandatory;
-      overscroll-behavior-y: contain;
-      scroll-behavior: smooth;
+    & .score {
+      flex: 0 0 var(--height);
+      width: 100%;
+      color: var(--color-text-subtle);
+      text-align: center;
+      background: none;
+      font-size: 3em;
+      line-height: var(--height);
       position: relative;
+      scroll-snap-align: center;
 
-      & .score {
-        flex: 0 0 var(--height);
-        width: 100%;
-        color: var(--color-text-subtle);
-        text-align: center;
-        background: none;
-        font-size: 3em;
-        line-height: var(--height);
-        position: relative;
-        scroll-snap-align: center;
-
-        &.current {
-          color: var(--color-text-default);
-        }
-
-        & .delta {
-          position: absolute;
-          display: block;
-          left: var(--padding-m);
-          top: var(--padding-m);
-          font-size: 1.5rem;
-          line-height: normal;
-          color: var(--color-text-subtle);
-          background: var(--color-background-input);
-          padding: .2em 0.5em;
-          border-radius: var(--border-readius-s);
-        }
-      }
-    }
-
-    & .steppers {
-      grid-area: stack;
-      z-index: 1;
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      gap: .4em;
-      margin-bottom: var(--padding-s);
-      pointer-events: none;
-      transition: margin-bottom 0.2s;
-
-      &[data-hidden] {
-        margin-bottom: -70px;
+      &.current {
+        color: var(--color-text-default);
       }
 
-      & button {
-        --size: 70px;
-
-        border-radius: 9999px;
-        height: var(--size);
-        width: var(--size);
-        aspect-ratio: 1 / 1;
-        cursor: pointer;
-        pointer-events: auto;
-
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-      }
-    }
-
-    & .click-counter {
-      flex-direction: column;
-      align-items: center;
-      position: absolute;
-      top: 50%;
-      background: var(--color-background-input);
-      color: var(--color-text-default);
-      border-radius: var(--border-readius-s);
-      overflow: hidden;
-      width: 70px;
-
-      & .timeout-progress {
-        appearance: none;
+      & .delta {
+        position: absolute;
         display: block;
-        border: none;
-        background: var(--color-progressbar);
-        height: 4px;
-        width: 100%;
+        left: var(--padding-m);
+        top: var(--padding-m);
+        font-size: 1.5rem;
+        line-height: normal;
+        color: var(--color-text-subtle);
+        background: var(--color-background-input);
+        padding: .2em 0.5em;
+        border-radius: var(--border-readius-s);
+      }
+    }
+  }
 
-        &::-webkit-progress-value {
-          background: var(--color-progress);
-        }
+  .steppers {
+    grid-area: body;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: .4em;
+    margin-bottom: var(--padding-s);
+    pointer-events: none;
+    transition: margin-bottom 0.2s;
 
-        &::-moz-progress-bar {
-          background: var(--color-progress);
-        }
+    &[data-hidden] {
+      margin-bottom: -70px;
+    }
 
-        &::-ms-fill {
-          background: var(--color-progress);
-        }
+    & button {
+      --size: 70px;
+
+      border-radius: 9999px;
+      height: var(--size);
+      width: var(--size);
+      aspect-ratio: 1 / 1;
+      cursor: pointer;
+      pointer-events: auto;
+
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  .delta-slider {
+    grid-area: body;
+    z-index: 1;
+    width: 90%;
+    background: var(--color-background-slider);
+    border-radius: 9999px;
+    align-self: center;
+    justify-self: center;
+    display: flex;
+    justify-content: center;
+    backdrop-filter: blur(9px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    position: relative;
+    transition: margin-bottom 0.2s;
+
+    &[data-hidden] {
+      margin-bottom: -400px;
+    }
+
+    & .delta-slider-knob {
+      --size: 50px;
+      --offsetX: 0px;
+
+      height: var(--size);
+      width: var(--size);
+      border-radius: 9999px;
+      background: var(--color-background-inverted);
+      transform: translateX(var(--offsetX));
+      cursor: grab;
+
+      & .delta-slider-value {
+        position: absolute;
+        top: -50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1em;
+        background: var(--color-background-slider);
+        color: var(--color-text-default);
+        border-radius: var(--border-readius-s);
+        backdrop-filter: blur(9px);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        min-width: 50px;
+        text-align: center;
+        padding: 0.1em 0.3em;
+      }
+
+      &[data-dragging] {
+        cursor: grabbing;
+      }
+    }
+  }
+
+  .click-counter {
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    background: var(--color-background-input);
+    color: var(--color-text-default);
+    border-radius: var(--border-readius-s);
+    overflow: hidden;
+    width: 70px;
+
+    & .timeout-progress {
+      appearance: none;
+      display: block;
+      border: none;
+      background: var(--color-progressbar);
+      height: 4px;
+      width: 100%;
+
+      &::-webkit-progress-value {
+        background: var(--color-progress);
+      }
+
+      &::-moz-progress-bar {
+        background: var(--color-progress);
+      }
+
+      &::-ms-fill {
+        background: var(--color-progress);
       }
     }
   }
@@ -256,18 +308,21 @@
 </style>
 
 <input class="name" type="text" placeholder="Player A" maxlength="10" />
-<div class="score-wrapper">
-  <div class="score-history">
-    <div class="score current">0</div>
-  </div>
-  <div class="click-counter" hidden>
-    <span class="click-count">0</span>
-    <progress class="timeout-progress" value="0" max="100"></progress>
-  </div>
-  <div class="steppers" data-hidden="true">
-    <button type="button" class="decrement">-1</button>
-    <button type="button" class="decrement">#</button>
-    <button type="button" class="increment">+1</button>
+<div class="score-history">
+  <div class="score current">0</div>
+</div>
+<div class="click-counter" hidden>
+  <span class="click-count">0</span>
+  <progress class="timeout-progress" value="0" max="100"></progress>
+</div>
+<div class="steppers" data-hidden="true">
+  <button type="button" class="decrement">-1</button>
+  <button type="button" class="decrement">#</button>
+  <button type="button" class="increment">+1</button>
+</div>
+<div class="delta-slider" data-hidden="true">
+  <div class="delta-slider-knob">
+    <div class="delta-slider-value">0</div>
   </div>
 </div>
 <button type="button" class="cycle-color-btn"></button>

@@ -40,15 +40,19 @@ class Player extends HTMLElement {
     // initialize the point button handling
     this.handlePointButtonClicks();
 
+    // initialize the delta slider handling
+    this.handleDeltaSlider();
+
     // hide/show the steppers
     const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
     scoreHistoryEl.addEventListener('pointerup', (event) => {
-      const steppersEl = this.shadowRoot.querySelector('.steppers');
-      const isHidden = steppersEl.hasAttribute('data-hidden');
+      // const steppersEl = this.shadowRoot.querySelector('.steppers');
+      const sliderEl = this.shadowRoot.querySelector('.delta-slider');
+      const isHidden = sliderEl.hasAttribute('data-hidden');
       if (isHidden)
-        steppersEl.removeAttribute('data-hidden');
+        sliderEl.removeAttribute('data-hidden');
       else
-        steppersEl.setAttribute('data-hidden', '');
+        sliderEl.setAttribute('data-hidden', '');
     });
   }
 
@@ -99,7 +103,11 @@ class Player extends HTMLElement {
     if (!steppersEl.hasAttribute('data-hidden')) {
       steppersEl.setAttribute('data-hidden', '');
     }
-
+    
+    const sliderEl = this.shadowRoot.querySelector('.delta-slider');
+    if (!sliderEl.hasAttribute('data-hidden')) {
+      sliderEl.setAttribute('data-hidden', '');
+    }
   }
 
   /**
@@ -126,6 +134,63 @@ class Player extends HTMLElement {
   set placeholderName(value) {
     this._placeholderName = value;
     this.shadowRoot.querySelector('.name').placeholder = this._placeholderName;
+  }
+
+  handleDeltaSlider() {
+    const sliderEl = this.shadowRoot.querySelector('.delta-slider');
+    const knobEl = this.shadowRoot.querySelector('.delta-slider-knob');
+    const valueEl = this.shadowRoot.querySelector('.delta-slider-value');
+
+    let knobRect;
+    let pointerOffset;
+    let value = 0;
+
+    knobEl.addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+      knobEl.setPointerCapture(event.pointerId);
+      knobEl.dataset.dragging = "true";
+
+      // determine pointer offset to knob center
+      knobRect = knobEl.getBoundingClientRect();
+      const knobCenterX = knobRect.left + knobRect.width / 2;
+      pointerOffset = event.clientX - knobCenterX;
+    });
+
+    knobEl.addEventListener('pointermove', (event) => {
+      if (!knobEl.dataset.dragging) return;
+      event.preventDefault();
+
+      const sliderRect = sliderEl.getBoundingClientRect();
+      const sliderCenterX = sliderRect.left + sliderRect.width / 2;
+      const knobMinX = -sliderRect.width / 2 + knobRect.width / 2;
+      const knobMaxX = sliderRect.width / 2 - knobRect.width / 2;
+
+      const knobPosition = event.clientX - sliderCenterX - pointerOffset;
+      const knobPositionClamped = Math.min(Math.max(knobPosition, knobMinX), knobMaxX);
+      event.clientX - sliderCenterX - pointerOffset;
+      knobEl.style.setProperty('--offsetX', `${knobPositionClamped}px`);
+      value = Number(knobPositionClamped.toFixed(0));
+      valueEl.innerText = value;
+    });
+
+    knobEl.addEventListener('pointerup', (event) => {
+      event.preventDefault();
+      knobEl.releasePointerCapture(event.pointerId);
+      delete knobEl.dataset.dragging;
+      this.adjustScore(value);
+    });
+
+    const cancelDragging = (event) => {
+      event.preventDefault();
+      delete knobEl.dataset.dragging; // Remove data-dragging attribute
+    };
+
+    knobEl.addEventListener('pointerleave', cancelDragging);
+    knobEl.addEventListener('pointercancel', cancelDragging);
+    knobEl.addEventListener('pointerout', cancelDragging);
+
+
+
   }
 
   handlePointButtonClicks() {
