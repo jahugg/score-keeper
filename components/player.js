@@ -43,11 +43,14 @@ class Player extends HTMLElement {
     // initialize the delta slider handling
     this.handleDeltaSlider();
 
+    // initialize score knob handling
+    this.handleKnobRotation();
+
     // hide/show the steppers
     const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
     scoreHistoryEl.addEventListener('pointerup', (event) => {
       // const steppersEl = this.shadowRoot.querySelector('.steppers');
-      const sliderEl = this.shadowRoot.querySelector('.delta-slider');
+      const sliderEl = this.shadowRoot.querySelector('.knob-container');
       const isHidden = sliderEl.hasAttribute('data-hidden');
       if (isHidden)
         sliderEl.removeAttribute('data-hidden');
@@ -103,7 +106,7 @@ class Player extends HTMLElement {
     if (!steppersEl.hasAttribute('data-hidden')) {
       steppersEl.setAttribute('data-hidden', '');
     }
-    
+
     const sliderEl = this.shadowRoot.querySelector('.delta-slider');
     if (!sliderEl.hasAttribute('data-hidden')) {
       sliderEl.setAttribute('data-hidden', '');
@@ -134,6 +137,89 @@ class Player extends HTMLElement {
   set placeholderName(value) {
     this._placeholderName = value;
     this.shadowRoot.querySelector('.name').placeholder = this._placeholderName;
+  }
+
+  handleKnobRotation() {
+    const knob = this.shadowRoot.querySelector('.knob-container .knob');
+    const valueDisplay = this.shadowRoot.querySelector('.knob-container .value');
+    const container = this.shadowRoot.querySelector('.knob-container');
+
+    let value = 0;
+    let angleSum = 0;
+    let lastAngle = null;
+    let lastTime = null;
+    let isDragging = false;
+    let rotation = 0;
+
+    const center = () => {
+      const rect = container.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      };
+    };
+
+    const getAngle = (x, y) => {
+      const c = center();
+      return Math.atan2(y - c.y, x - c.x) * (180 / Math.PI);
+    };
+
+    const normalizeDelta = (delta) => {
+      if (delta > 180) return delta - 360;
+      if (delta < -180) return delta + 360;
+      return delta;
+    };
+
+    const update = (angleDelta) => {
+      const now = performance.now();
+      let deltaTime = now - lastTime;
+      lastTime = now;
+
+      deltaTime = Math.max(deltaTime, 8); // minimum for flicks
+
+      const velocity = Math.abs(angleDelta) / deltaTime;
+      const acceleration = Math.min(1 + velocity * 20, 5);
+
+      angleSum += angleDelta * acceleration;
+
+      const stepSize = 10;
+      const steps = Math.floor(angleSum / stepSize);
+      if (steps !== 0) {
+        value += steps;
+        angleSum -= steps * stepSize;
+        valueDisplay.textContent = value;
+      }
+
+      rotation += angleDelta;
+      knob.style.transform = `rotate(${rotation}deg)`;
+    };
+
+    const pointerDown = (e) => {
+      isDragging = true;
+      const { clientX, clientY } = e;
+      lastAngle = getAngle(clientX, clientY);
+      lastTime = performance.now();
+      knob.setPointerCapture(e.pointerId);
+    };
+
+    const pointerMove = (e) => {
+      if (!isDragging) return;
+      const { clientX, clientY } = e;
+      const angle = getAngle(clientX, clientY);
+      const delta = normalizeDelta(angle - lastAngle);
+      update(delta);
+      lastAngle = angle;
+    };
+
+    const pointerUp = () => {
+      isDragging = false;
+      this.adjustScore(value);
+    };
+
+    knob.addEventListener('pointerdown', pointerDown);
+    knob.addEventListener('pointermove', pointerMove);
+    knob.addEventListener('pointerup', pointerUp);
+    knob.addEventListener('pointercancel', pointerUp);
   }
 
   handleDeltaSlider() {

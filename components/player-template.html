@@ -40,7 +40,8 @@
 
     /* borders */
     --border-default: solid 2px var(--color-outline);
-    --border-readius-s: 3px;
+    --border-radius-s: 3px;
+    --border-radius-infinite: 99999px;
 
     /* fonts */
     /* --font-regular etc here... */
@@ -170,7 +171,7 @@
         color: var(--color-text-subtle);
         background: var(--color-background-input);
         padding: .2em 0.5em;
-        border-radius: var(--border-readius-s);
+        border-radius: var(--border-radius-s);
       }
     }
   }
@@ -203,6 +204,58 @@
       background: rgba(255, 255, 255, 0.2);
       backdrop-filter: blur(10px);
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  .knob-container {
+    --size: 100px;
+
+    grid-area: body;
+    align-self: center;
+    justify-self: center;
+    z-index: 10;
+    border-radius: var(--border-radius-s);
+    background: var(--color-background-slider);
+    backdrop-filter: blur(9px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    padding: var(--padding-s) var(--padding-m);
+    display: flex;
+    flex-direction: column;
+    gap: var(--padding-s);
+    transition: margin-bottom 0.2s;
+
+    &[data-hidden] {
+      margin-bottom: -400px;
+    }
+
+    & .knob {
+      width: var(--size);
+      height: var(--size);
+      background: var(--color-background-inverted);
+      border-radius: var(--border-radius-infinite);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      position: relative;
+
+      &::before {
+        --size: 10px;
+        content: '';
+        width: var(--size);
+        height: var(--size);
+        background: var(--color-background-input);
+        border-radius: 50%;
+        position: absolute;
+        top: var(--size);
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+
+    & .value {
+      bottom: -1.5em;
+      font-size: 1em;
+      color: var(--color-text-default);
+      text-align: center;
+      padding: 0.1em 0.3em;
     }
   }
 
@@ -243,9 +296,9 @@
         transform: translate(-50%, -50%);
         font-size: 1em;
         background: var(--color-background-slider);
-        color: var(--color-text-default);
-        border-radius: var(--border-readius-s);
         backdrop-filter: blur(9px);
+        color: var(--color-text-default);
+        border-radius: var(--border-radius-s);
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
         min-width: 50px;
         text-align: center;
@@ -265,7 +318,7 @@
     top: 50%;
     background: var(--color-background-input);
     color: var(--color-text-default);
-    border-radius: var(--border-readius-s);
+    border-radius: var(--border-radius-s);
     overflow: hidden;
     width: 70px;
 
@@ -315,7 +368,7 @@
   <span class="click-count">0</span>
   <progress class="timeout-progress" value="0" max="100"></progress>
 </div>
-<div class="steppers" data-hidden="true">
+<div class="steppers" data-hidden="true" hidden>
   <button type="button" class="decrement">-1</button>
   <button type="button" class="decrement">#</button>
   <button type="button" class="increment">+1</button>
@@ -324,5 +377,9 @@
   <div class="delta-slider-knob">
     <div class="delta-slider-value">0</div>
   </div>
+</div>
+<div class="knob-container" data-hidden="true">
+  <div class="knob"></div>
+  <div class="value">0</div>
 </div>
 <button type="button" class="cycle-color-btn"></button>
