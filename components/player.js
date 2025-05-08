@@ -214,6 +214,8 @@ class Player extends HTMLElement {
     const pointerUp = () => {
       isDragging = false;
       this.adjustScore(value);
+
+      knob.style.transform = `rotate(0deg)`;
     };
 
     knob.addEventListener('pointerdown', pointerDown);
