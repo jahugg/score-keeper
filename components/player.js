@@ -40,9 +40,6 @@ class Player extends HTMLElement {
     // initialize the point button handling
     this.handlePointButtonClicks();
 
-    // initialize the delta slider handling
-    this.handleDeltaSlider();
-
     // initialize score knob handling
     this.handleKnobRotation();
 
@@ -106,11 +103,6 @@ class Player extends HTMLElement {
     if (!steppersEl.hasAttribute('data-hidden')) {
       steppersEl.setAttribute('data-hidden', '');
     }
-
-    const sliderEl = this.shadowRoot.querySelector('.delta-slider');
-    if (!sliderEl.hasAttribute('data-hidden')) {
-      sliderEl.setAttribute('data-hidden', '');
-    }
   }
 
   /**
@@ -152,7 +144,7 @@ class Player extends HTMLElement {
     let rotation = 0;
 
     const center = () => {
-      const rect = container.getBoundingClientRect();
+      const rect = knob.getBoundingClientRect();
       return {
         x: rect.left + rect.width / 2,
         y: rect.top + rect.height / 2
@@ -187,7 +179,9 @@ class Player extends HTMLElement {
       if (steps !== 0) {
         value += steps;
         angleSum -= steps * stepSize;
-        valueDisplay.textContent = value;
+
+        // Prepend "+" if value is positive
+        valueDisplay.textContent = value > 0 ? `+${value}` : `${value}`;
       }
 
       rotation += angleDelta;
@@ -215,70 +209,20 @@ class Player extends HTMLElement {
       isDragging = false;
       this.adjustScore(value);
 
-      knob.style.transform = `rotate(0deg)`;
+      // Reset knob rotation and value
+      rotation = 0;
+      value = 0;
+      knob.style.transform = `rotate(${rotation}deg)`;
+      valueDisplay.textContent = value;
+
+      // Hide the knob container
+      container.setAttribute('data-hidden', '');
     };
 
     knob.addEventListener('pointerdown', pointerDown);
     knob.addEventListener('pointermove', pointerMove);
     knob.addEventListener('pointerup', pointerUp);
     knob.addEventListener('pointercancel', pointerUp);
-  }
-
-  handleDeltaSlider() {
-    const sliderEl = this.shadowRoot.querySelector('.delta-slider');
-    const knobEl = this.shadowRoot.querySelector('.delta-slider-knob');
-    const valueEl = this.shadowRoot.querySelector('.delta-slider-value');
-
-    let knobRect;
-    let pointerOffset;
-    let value = 0;
-
-    knobEl.addEventListener('pointerdown', (event) => {
-      event.preventDefault();
-      knobEl.setPointerCapture(event.pointerId);
-      knobEl.dataset.dragging = "true";
-
-      // determine pointer offset to knob center
-      knobRect = knobEl.getBoundingClientRect();
-      const knobCenterX = knobRect.left + knobRect.width / 2;
-      pointerOffset = event.clientX - knobCenterX;
-    });
-
-    knobEl.addEventListener('pointermove', (event) => {
-      if (!knobEl.dataset.dragging) return;
-      event.preventDefault();
-
-      const sliderRect = sliderEl.getBoundingClientRect();
-      const sliderCenterX = sliderRect.left + sliderRect.width / 2;
-      const knobMinX = -sliderRect.width / 2 + knobRect.width / 2;
-      const knobMaxX = sliderRect.width / 2 - knobRect.width / 2;
-
-      const knobPosition = event.clientX - sliderCenterX - pointerOffset;
-      const knobPositionClamped = Math.min(Math.max(knobPosition, knobMinX), knobMaxX);
-      event.clientX - sliderCenterX - pointerOffset;
-      knobEl.style.setProperty('--offsetX', `${knobPositionClamped}px`);
-      value = Number(knobPositionClamped.toFixed(0));
-      valueEl.innerText = value;
-    });
-
-    knobEl.addEventListener('pointerup', (event) => {
-      event.preventDefault();
-      knobEl.releasePointerCapture(event.pointerId);
-      delete knobEl.dataset.dragging;
-      this.adjustScore(value);
-    });
-
-    const cancelDragging = (event) => {
-      event.preventDefault();
-      delete knobEl.dataset.dragging; // Remove data-dragging attribute
-    };
-
-    knobEl.addEventListener('pointerleave', cancelDragging);
-    knobEl.addEventListener('pointercancel', cancelDragging);
-    knobEl.addEventListener('pointerout', cancelDragging);
-
-
-
   }
 
   handlePointButtonClicks() {
@@ -346,6 +290,7 @@ class Player extends HTMLElement {
   };
 
   adjustScore(delta) {
+    if (delta === 0) return; // Ignore zero values
     this.score = this._score + delta;
   }
 

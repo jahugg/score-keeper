@@ -208,27 +208,26 @@
   }
 
   .knob-container {
-    --size: 100px;
-
     grid-area: body;
-    align-self: center;
-    justify-self: center;
     z-index: 10;
-    border-radius: var(--border-radius-s);
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--padding-s);
+    transition: opacity 0.2s;
+    padding: var(--padding-m);
     background: var(--color-background-slider);
     backdrop-filter: blur(9px);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    padding: var(--padding-s) var(--padding-m);
-    display: flex;
-    flex-direction: column;
-    gap: var(--padding-s);
-    transition: margin-bottom 0.2s;
 
     &[data-hidden] {
-      margin-bottom: -400px;
+      opacity: 0;
+      pointer-events: none;
     }
 
     & .knob {
+      --size: 100px;
+      flex: 0 0 auto;
       width: var(--size);
       height: var(--size);
       background: var(--color-background-inverted);
@@ -251,63 +250,13 @@
     }
 
     & .value {
+      flex: 1 1 1000px;
+      width: 100%;
       bottom: -1.5em;
-      font-size: 1em;
+      font-size: 2em;
       color: var(--color-text-default);
       text-align: center;
       padding: 0.1em 0.3em;
-    }
-  }
-
-  .delta-slider {
-    grid-area: body;
-    z-index: 1;
-    width: 90%;
-    background: var(--color-background-slider);
-    border-radius: 9999px;
-    align-self: center;
-    justify-self: center;
-    display: flex;
-    justify-content: center;
-    backdrop-filter: blur(9px);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    position: relative;
-    transition: margin-bottom 0.2s;
-
-    &[data-hidden] {
-      margin-bottom: -400px;
-    }
-
-    & .delta-slider-knob {
-      --size: 50px;
-      --offsetX: 0px;
-
-      height: var(--size);
-      width: var(--size);
-      border-radius: 9999px;
-      background: var(--color-background-inverted);
-      transform: translateX(var(--offsetX));
-      cursor: grab;
-
-      & .delta-slider-value {
-        position: absolute;
-        top: -50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 1em;
-        background: var(--color-background-slider);
-        backdrop-filter: blur(9px);
-        color: var(--color-text-default);
-        border-radius: var(--border-radius-s);
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-        min-width: 50px;
-        text-align: center;
-        padding: 0.1em 0.3em;
-      }
-
-      &[data-dragging] {
-        cursor: grabbing;
-      }
     }
   }
 
@@ -372,11 +321,6 @@
   <button type="button" class="decrement">-1</button>
   <button type="button" class="decrement">#</button>
   <button type="button" class="increment">+1</button>
-</div>
-<div class="delta-slider" data-hidden="true">
-  <div class="delta-slider-knob">
-    <div class="delta-slider-value">0</div>
-  </div>
 </div>
 <div class="knob-container" data-hidden="true">
   <div class="value">0</div>
