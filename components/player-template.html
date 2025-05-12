@@ -145,6 +145,13 @@
     overscroll-behavior-y: contain;
     scroll-behavior: smooth;
     position: relative;
+    transition: all 0.2s;
+
+    &[data-hidden] {
+      filter: blur(2px);
+      transform: scale(0.9);
+      opacity: .5;
+    }
 
     & .score {
       flex: 0 0 var(--height);
@@ -217,17 +224,21 @@
     gap: var(--padding-s);
     transition: opacity 0.2s;
     padding: var(--padding-m);
-    background: var(--color-background-slider);
-    backdrop-filter: blur(9px);
 
     &[data-hidden] {
       opacity: 0;
       pointer-events: none;
     }
 
+    & > * {
+      flex: 0 0 50%;
+      width: 50%;
+      display: flex;
+      justify-content: center;
+    }
+
     & .knob {
       --size: 100px;
-      flex: 0 0 auto;
       width: var(--size);
       height: var(--size);
       background: var(--color-background-inverted);
@@ -250,11 +261,10 @@
     }
 
     & .value {
-      flex: 1 1 1000px;
-      width: 100%;
-      bottom: -1.5em;
-      font-size: 2em;
+      font-size: 1.5em;
       color: var(--color-text-default);
+      background: var(--color-background-input);
+      border-radius: var(--border-radius-s);
       text-align: center;
       padding: 0.1em 0.3em;
     }
@@ -324,6 +334,8 @@
 </div>
 <div class="knob-container" data-hidden="true">
   <div class="value">0</div>
-  <div class="knob"></div>
+  <div>
+    <div class="knob"></div>
+  </div>
 </div>
 <button type="button" class="cycle-color-btn"></button>

@@ -47,12 +47,15 @@ class Player extends HTMLElement {
     const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
     scoreHistoryEl.addEventListener('pointerup', (event) => {
       // const steppersEl = this.shadowRoot.querySelector('.steppers');
-      const sliderEl = this.shadowRoot.querySelector('.knob-container');
-      const isHidden = sliderEl.hasAttribute('data-hidden');
-      if (isHidden)
-        sliderEl.removeAttribute('data-hidden');
-      else
-        sliderEl.setAttribute('data-hidden', '');
+      const knobContainerEl = this.shadowRoot.querySelector('.knob-container');
+      const isHidden = knobContainerEl.hasAttribute('data-hidden');
+      if (isHidden) {
+        knobContainerEl.removeAttribute('data-hidden');
+        scoreHistoryEl.setAttribute('data-hidden', '')
+      } else {
+        knobContainerEl.setAttribute('data-hidden', '');
+        scoreHistoryEl.removeAttribute('data-hidden');
+      }
     });
   }
 
@@ -76,6 +79,11 @@ class Player extends HTMLElement {
 
     const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
     this.shadowRoot.querySelector('.score').value = this._score;
+    if (scoreHistoryEl.hasAttribute('data-hidden')) {
+      scoreHistoryEl.removeAttribute('data-hidden', '');
+    }
+
+    if (delta === 0) return; // Ignore zero values
 
     // remove current classes from all elements with score class
     const currentScoreEls = scoreHistoryEl.querySelectorAll('.score.current');
@@ -97,12 +105,6 @@ class Player extends HTMLElement {
 
     // Scroll to the bottom
     scoreHistoryEl.scrollTop = scoreHistoryEl.scrollHeight;
-
-    // hide steppers
-    const steppersEl = this.shadowRoot.querySelector('.steppers');
-    if (!steppersEl.hasAttribute('data-hidden')) {
-      steppersEl.setAttribute('data-hidden', '');
-    }
   }
 
   /**
@@ -290,7 +292,6 @@ class Player extends HTMLElement {
   };
 
   adjustScore(delta) {
-    if (delta === 0) return; // Ignore zero values
     this.score = this._score + delta;
   }
 
