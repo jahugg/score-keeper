@@ -144,6 +144,7 @@ class Player extends HTMLElement {
     let lastTime = null;
     let isDragging = false;
     let rotation = 0;
+    let startTime = null; // Shared variable for progress bar animation start time
 
     const center = () => {
       const rect = knob.getBoundingClientRect();
@@ -205,20 +206,46 @@ class Player extends HTMLElement {
       const delta = normalizeDelta(angle - lastAngle);
       update(delta);
       lastAngle = angle;
+
+      // Cancel and reset the progress bar
+      let progressBar = this.shadowRoot.querySelector('.timeout-progress');
+      progressBar.value = 0;
+
+      // Reset the start time of the progress bar animation
+      startTime = performance.now();
     };
 
     const pointerUp = () => {
       isDragging = false;
-      this.adjustScore(value);
+      const changeDelay = 1500; // Delay in milliseconds
 
-      // Reset knob rotation and value
-      rotation = 0;
-      value = 0;
-      knob.style.transform = `rotate(${rotation}deg)`;
-      valueDisplay.textContent = value;
+      // Animate progress bar
+      let progressBar = this.shadowRoot.querySelector('.timeout-progress');
+      progressBar.value = 0;
+      startTime = performance.now(); // Initialize start time
+      const updateProgress = (currentTime) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min((elapsed / changeDelay) * 100, 100);
+        progressBar.value = progress;
 
-      // Hide the knob container
-      container.setAttribute('data-hidden', '');
+        if (elapsed < changeDelay) {
+          requestAnimationFrame(updateProgress);
+        } else {
+          this.adjustScore(value);
+          progressBar.value = 0;
+
+          // Reset knob rotation and value
+          rotation = 0;
+          value = 0;
+          knob.style.transform = `rotate(${rotation}deg)`;
+          valueDisplay.textContent = value;
+
+          // Hide the knob container
+          container.setAttribute('data-hidden', '');
+        }
+      };
+
+      requestAnimationFrame(updateProgress);
     };
 
     knob.addEventListener('pointerdown', pointerDown);
