@@ -144,7 +144,9 @@ class Player extends HTMLElement {
     let lastTime = null;
     let isDragging = false;
     let rotation = 0;
+
     let startTime = null; // Shared variable for progress bar animation start time
+    let progressBarAnimationFrame = null; // Shared variable to track the animation frame
 
     const center = () => {
       const rect = knob.getBoundingClientRect();
@@ -211,6 +213,12 @@ class Player extends HTMLElement {
       let progressBar = this.shadowRoot.querySelector('.timeout-progress');
       progressBar.value = 0;
 
+      // Cancel the progress bar animation if it is running
+      if (progressBarAnimationFrame) {
+        cancelAnimationFrame(progressBarAnimationFrame);
+        progressBarAnimationFrame = null;
+      }
+
       // Reset the start time of the progress bar animation
       startTime = performance.now();
     };
@@ -229,7 +237,7 @@ class Player extends HTMLElement {
         progressBar.value = progress;
 
         if (elapsed < changeDelay) {
-          requestAnimationFrame(updateProgress);
+          progressBarAnimationFrame = requestAnimationFrame(updateProgress);
         } else {
           this.adjustScore(value);
           progressBar.value = 0;
@@ -242,10 +250,11 @@ class Player extends HTMLElement {
 
           // Hide the knob container
           container.setAttribute('data-hidden', '');
+          progressBarAnimationFrame = null; // Clear the animation frame reference
         }
       };
 
-      requestAnimationFrame(updateProgress);
+      progressBarAnimationFrame = requestAnimationFrame(updateProgress);
     };
 
     knob.addEventListener('pointerdown', pointerDown);
