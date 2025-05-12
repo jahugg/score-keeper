@@ -322,6 +322,10 @@
       height: 4px;
       width: 100%;
 
+      &::-webkit-progress-bar {
+        background: var(--color-progressbar);
+      }
+
       &::-webkit-progress-value {
         background: var(--color-progress);
       }
@@ -341,7 +345,6 @@
     --offset: 10px;
 
     position: absolute;
-    /* display: block; */
     display: none;
     top: var(--offset);
     right: var(--offset);
