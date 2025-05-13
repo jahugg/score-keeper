@@ -59,6 +59,9 @@ class Player extends HTMLElement {
       else
         knobContainerEl.setAttribute('data-hidden', '');
     });
+
+    // Add event listener for scroll to update pagination dots
+    scoreHistoryEl.addEventListener('scroll', this.updatePaginationDots.bind(this), { passive: true });
   }
 
   connectedCallback() {
@@ -104,6 +107,25 @@ class Player extends HTMLElement {
 
     // Scroll to the bottom
     scoreHistoryEl.scrollTop = scoreHistoryEl.scrollHeight;
+
+    // update pagination
+    const paginationContainerEl = this.shadowRoot.querySelector('.pagination');
+    const paginationDots = this.shadowRoot.querySelectorAll(".pagination li");
+
+    if (paginationDots.length === 0) {
+      // create additional pagination dot for first page
+      const paginationEl = document.createElement("li");
+      paginationContainerEl.appendChild(paginationEl);
+    } else {
+      // remove active attribute of all dots
+      for (const dot of paginationDots)
+        delete dot.dataset.active;
+    }
+
+    const paginationEl = document.createElement("li");
+    paginationEl.dataset.active = "true";
+    paginationContainerEl.appendChild(paginationEl);
+
   }
 
   /**
@@ -264,6 +286,27 @@ class Player extends HTMLElement {
     knob.addEventListener('pointermove', pointerMove);
     knob.addEventListener('pointerup', pointerUp);
     knob.addEventListener('pointercancel', pointerUp);
+  }
+
+  // Simplified function to update pagination dots
+  updatePaginationDots() {
+    const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
+    const scores = Array.from(scoreHistoryEl.querySelectorAll('.score'));
+    const paginationDots = Array.from(this.shadowRoot.querySelectorAll('.pagination li'));
+
+    const activeIndex = scores.findIndex((score) => {
+      const rect = score.getBoundingClientRect();
+      const parentRect = scoreHistoryEl.getBoundingClientRect();
+      return rect.top >= parentRect.top && rect.bottom <= parentRect.bottom;
+    });
+
+    paginationDots.forEach((dot, index) => {
+      if (index === activeIndex) {
+        dot.dataset.active = 'true';
+      } else {
+        delete dot.dataset.active; // Ensure active attribute is removed
+      }
+    });
   }
 
   adjustScore(delta) {

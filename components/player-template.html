@@ -30,7 +30,9 @@
     --color-background-inverted: var(--color-white);
     --color-background-input: var(--color-player-fade1);
     --color-background-input-active: var(--color-player-fade2);
-    --color-background-slider: var(--color-white-alpha);
+    --color-background-pagination: var(--color-player-fade2);
+    --color-background-pagination-active: var(--color-white);
+
     --color-text-default: var(--color-white);
     --color-text-inverted: var(--color-player);
     --color-text-subtle: var(--color-player-fade3);
@@ -176,6 +178,34 @@
     }
   }
 
+
+
+  .pagination {
+    grid-area: body;
+    justify-self: end; /* Align to the right */
+    align-self: center; /* Align to vertical center */
+    
+    display: flex;
+    flex-direction: column; /* Ensure horizontal alignment */
+    list-style-type: none;
+    margin: 0 var(--padding-m);
+    padding: 0;
+    gap: 3px;
+
+    & li {
+      --size: 6px;
+      width: var(--size);
+      height: var(--size);
+      border-radius: var(--border-radius-infinite);
+      background: var(--color-background-pagination);
+      transition: background 0.2s;
+
+      &[data-active] {
+        background: var(--color-background-pagination-active);
+      }
+    }
+  }
+
   .knob-container {
     grid-row: 1 / 3;
     grid-column: 1 / 3;
@@ -290,6 +320,8 @@
 <div class="score-history">
   <div class="score current">0</div>
 </div>
+<ul class="pagination">
+</ul>
 <div class="knob-container" data-hidden="true">
   <div class="delta-container">
     <span class="value">0</span>
