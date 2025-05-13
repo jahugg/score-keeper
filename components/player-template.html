@@ -148,6 +148,11 @@
     scroll-behavior: smooth;
     position: relative;
 
+    scrollbar-width: none;
+    /* Hide scrollbar in Firefox */
+    -ms-overflow-style: none;
+    /* Hide scrollbar in Internet Explorer */
+
     & .score {
       flex: 0 0 var(--height);
       width: 100%;
@@ -176,24 +181,29 @@
         border-radius: var(--border-radius-s);
       }
     }
+    &::-webkit-scrollbar {
+      display: none;
+      /* Hide scrollbar in WebKit browsers */
+    }
   }
-
-
 
   .pagination {
     grid-area: body;
-    justify-self: end; /* Align to the right */
-    align-self: center; /* Align to vertical center */
-    
+    justify-self: end;
+    /* Align to the right */
+    align-self: center;
+    /* Align to vertical center */
+
     display: flex;
-    flex-direction: column; /* Ensure horizontal alignment */
+    flex-direction: column;
+    /* Ensure horizontal alignment */
     list-style-type: none;
     margin: 0 var(--padding-m);
     padding: 0;
     gap: 3px;
 
     & li {
-      --size: 6px;
+      --size: 7px;
       width: var(--size);
       height: var(--size);
       border-radius: var(--border-radius-infinite);

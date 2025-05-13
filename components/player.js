@@ -301,11 +301,10 @@ class Player extends HTMLElement {
     });
 
     paginationDots.forEach((dot, index) => {
-      if (index === activeIndex) {
+      if (index === activeIndex)
         dot.dataset.active = 'true';
-      } else {
+      else
         delete dot.dataset.active; // Ensure active attribute is removed
-      }
     });
   }
 
