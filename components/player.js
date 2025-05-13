@@ -37,11 +37,16 @@ class Player extends HTMLElement {
     const colorCycleButton = this.shadowRoot.querySelector(".cycle-color-btn")
     colorCycleButton.addEventListener("pointerup", (event) => { this.cycleColor() });
 
-    // initialize the point button handling
-    this.handlePointButtonClicks();
-
     // initialize score knob handling
     this.handleKnobRotation();
+
+    const knobContainerEl = this.shadowRoot.querySelector('.knob-container');
+    knobContainerEl.addEventListener("pointerup", (event) => {
+      const isContainer = event.target.classList.contains('knob-container')
+      if (isContainer) {
+        knobContainerEl.setAttribute('data-hidden', '');
+      }
+    });
 
     // hide/show the steppers
     const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
@@ -49,13 +54,10 @@ class Player extends HTMLElement {
       // const steppersEl = this.shadowRoot.querySelector('.steppers');
       const knobContainerEl = this.shadowRoot.querySelector('.knob-container');
       const isHidden = knobContainerEl.hasAttribute('data-hidden');
-      if (isHidden) {
+      if (isHidden)
         knobContainerEl.removeAttribute('data-hidden');
-        scoreHistoryEl.setAttribute('data-hidden', '')
-      } else {
+      else
         knobContainerEl.setAttribute('data-hidden', '');
-        scoreHistoryEl.removeAttribute('data-hidden');
-      }
     });
   }
 
@@ -79,9 +81,6 @@ class Player extends HTMLElement {
 
     const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
     this.shadowRoot.querySelector('.score').value = this._score;
-    if (scoreHistoryEl.hasAttribute('data-hidden')) {
-      scoreHistoryEl.removeAttribute('data-hidden', '');
-    }
 
     if (delta === 0) return; // Ignore zero values
 
@@ -175,7 +174,11 @@ class Player extends HTMLElement {
       deltaTime = Math.max(deltaTime, 8); // minimum for flicks
 
       const velocity = Math.abs(angleDelta) / deltaTime;
-      const acceleration = Math.min(1 + velocity * 20, 5);
+
+      // Adjust acceleration based on velocity
+      const acceleration = velocity < 1
+        ? .5 // Slow movements change value half as fast
+        : Math.min(1 + velocity * 25, 6); // Faster changes increase slightly faster
 
       angleSum += angleDelta * acceleration;
 
@@ -262,70 +265,6 @@ class Player extends HTMLElement {
     knob.addEventListener('pointerup', pointerUp);
     knob.addEventListener('pointercancel', pointerUp);
   }
-
-  handlePointButtonClicks() {
-    let clickCount = 0;
-    let timeout;
-    const changeDelay = 1000; // Delay in milliseconds
-
-    const incrementButton = this.shadowRoot.querySelector('.increment');
-    const decrementButton = this.shadowRoot.querySelector('.decrement');
-
-    const handleButtonClick = (type) => {
-      clickCount += type === 'increment' ? 1 : -1;
-      clearTimeout(timeout);
-
-      // Display click counter with click count
-      let clickCounterEl = this.shadowRoot.querySelector('.click-counter');
-      let clickCountEl = this.shadowRoot.querySelector('.click-count');
-      let progressBar = this.shadowRoot.querySelector('.timeout-progress');
-
-      if (clickCounterEl.hasAttribute('hidden')) {
-        clickCounterEl.removeAttribute('hidden');
-        clickCounterEl.style.display = 'flex';
-      }
-      clickCountEl.innerText = clickCount > 0 ? `+${clickCount}` : `${clickCount}`;
-
-      this.restartAnimation(clickCounterEl, 'animate-pop');
-
-      // Reset progress bar
-      progressBar.value = 0;
-      const startTime = performance.now();
-      const updateProgress = (currentTime) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min((elapsed / changeDelay) * 100, 100);
-        progressBar.value = progress;
-
-        if (elapsed < changeDelay) {
-          requestAnimationFrame(updateProgress);
-        }
-      };
-
-      requestAnimationFrame(updateProgress);
-
-      // Process accumulated clicks after a short delay
-      timeout = setTimeout(() => {
-        this.adjustScore(clickCount);
-        clickCount = 0;
-        this.restartAnimation(clickCounterEl, 'animate-apply');
-      }, changeDelay);
-
-      clickCounterEl.addEventListener('animationend', (event) => {
-        if (event.animationName === 'apply') {
-          clickCounterEl.classList.remove('animate-apply');
-          clickCounterEl.setAttribute('hidden', '');
-          clickCounterEl.style.display = 'none';
-
-          // Reset attributes applied by the animation
-          clickCounterEl.style.transform = '';
-          clickCounterEl.style.opacity = '';
-        }
-      });
-    };
-
-    incrementButton.addEventListener('pointerup', () => handleButtonClick('increment'));
-    decrementButton.addEventListener('pointerup', () => handleButtonClick('decrement'));
-  };
 
   adjustScore(delta) {
     this.score = this._score + delta;

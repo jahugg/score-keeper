@@ -49,7 +49,7 @@
     font-family: var(--font-family);
     position: relative;
     width: 100%;
-    flex: 1 1 min-content;
+    flex: 0 0 min-content;
     max-width: 400px;
     font-size: 2em;
     color: var(--color-text-default);
@@ -145,13 +145,6 @@
     overscroll-behavior-y: contain;
     scroll-behavior: smooth;
     position: relative;
-    transition: all 0.2s;
-
-    &[data-hidden] {
-      filter: blur(2px);
-      transform: scale(0.9);
-      opacity: .5;
-    }
 
     & .score {
       flex: 0 0 var(--height);
@@ -183,39 +176,9 @@
     }
   }
 
-  .steppers {
-    grid-area: body;
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: .4em;
-    margin-bottom: var(--padding-s);
-    pointer-events: none;
-    transition: margin-bottom 0.2s;
-
-    &[data-hidden] {
-      margin-bottom: -70px;
-    }
-
-    & button {
-      --size: 70px;
-
-      border-radius: 9999px;
-      height: var(--size);
-      width: var(--size);
-      aspect-ratio: 1 / 1;
-      cursor: pointer;
-      pointer-events: auto;
-
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    }
-  }
-
   .knob-container {
-    grid-area: body;
+    grid-row: 1 / 3;
+    grid-column: 1 / 3;
     z-index: 10;
     height: 100%;
     display: flex;
@@ -225,6 +188,7 @@
     gap: var(--padding-s);
     transition: opacity 0.2s;
     padding: var(--padding-m);
+    background: var(--color-background-input);
 
     &[data-hidden] {
       opacity: 0;
@@ -239,20 +203,21 @@
     }
 
     & .knob {
-      --size: 100px;
+      --size: 120px;
       width: var(--size);
       height: var(--size);
       background: var(--color-background-inverted);
       border-radius: var(--border-radius-infinite);
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       position: relative;
+      border: solid 6px var(--color-player-fade2);
 
       &::before {
         --size: 10px;
         content: '';
         width: var(--size);
         height: var(--size);
-        background: var(--color-background-input);
+        background: var(--color-player-fade2);
         border-radius: 50%;
         position: absolute;
         top: var(--size);
@@ -267,9 +232,9 @@
       background: var(--color-background-inverted);
       border-radius: var(--border-radius-s);
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
       flex: 0 0 auto;
       width: auto;
+      overflow: hidden;
 
       & .value {
         font-size: 1.5em;
@@ -280,12 +245,15 @@
       & .timeout-progress {
         appearance: none;
         display: block;
-        border: none;
-        background: var(--color-progressbar);
+        background: none;
         height: 100%;
         width: 100%;
         position: absolute;
-        bottom: 0;
+        border: none;
+
+        &::-webkit-progress-bar {
+          background: none;
+        }
 
         &::-webkit-progress-value {
           background: var(--color-progress);
@@ -300,43 +268,6 @@
         }
       }
 
-    }
-  }
-
-  .click-counter {
-    flex-direction: column;
-    align-items: center;
-    position: absolute;
-    top: 50%;
-    background: var(--color-background-input);
-    color: var(--color-text-default);
-    border-radius: var(--border-radius-s);
-    overflow: hidden;
-    width: 70px;
-
-    & .timeout-progress {
-      appearance: none;
-      display: block;
-      border: none;
-      background: var(--color-progressbar);
-      height: 4px;
-      width: 100%;
-
-      &::-webkit-progress-bar {
-        background: var(--color-progressbar);
-      }
-
-      &::-webkit-progress-value {
-        background: var(--color-progress);
-      }
-
-      &::-moz-progress-bar {
-        background: var(--color-progress);
-      }
-
-      &::-ms-fill {
-        background: var(--color-progress);
-      }
     }
   }
 
@@ -358,11 +289,6 @@
 <input class="name" type="text" placeholder="Player A" maxlength="10" />
 <div class="score-history">
   <div class="score current">0</div>
-</div>
-<div class="steppers" data-hidden="true" hidden>
-  <button type="button" class="decrement">-1</button>
-  <button type="button" class="decrement">#</button>
-  <button type="button" class="increment">+1</button>
 </div>
 <div class="knob-container" data-hidden="true">
   <div class="delta-container">
