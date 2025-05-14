@@ -149,9 +149,11 @@
     position: relative;
 
     scrollbar-width: none;
-    /* Hide scrollbar in Firefox */
     -ms-overflow-style: none;
-    /* Hide scrollbar in Internet Explorer */
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     & .score {
       flex: 0 0 var(--height);
@@ -168,22 +170,40 @@
         color: var(--color-text-default);
       }
 
+      /* hide delta information of first score element */
+      &:first-of-type .delta {
+        /* display: none; */
+      }
+
       & .delta {
         position: absolute;
-        display: block;
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: stretch;
+        gap: 4px;
         left: var(--padding-m);
         top: var(--padding-m);
-        font-size: 1.5rem;
-        line-height: normal;
-        color: var(--color-text-subtle);
-        background: var(--color-background-input);
-        padding: .2em 0.5em;
-        border-radius: var(--border-radius-s);
+
+        & .value {
+          font-size: 1.5rem;
+          line-height: normal;
+          color: var(--color-text-subtle);
+          background: var(--color-background-input);
+          padding: .2em 0.5em;
+          border-radius: var(--border-radius-s);
+        }
+
+        & .undo {
+          flex: 1;
+          background: var(--color-background-input);
+          border-radius: var(--border-radius-s);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          padding: 0 5px;
+        }
       }
-    }
-    &::-webkit-scrollbar {
-      display: none;
-      /* Hide scrollbar in WebKit browsers */
     }
   }
 
@@ -212,6 +232,11 @@
 
       &[data-active] {
         background: var(--color-background-pagination-active);
+      }
+
+      /* don't show pagination if only one page */
+      &:only-child {
+        display: none;
       }
     }
   }
@@ -328,9 +353,18 @@
 
 <input class="name" type="text" placeholder="Player A" maxlength="10" />
 <div class="score-history">
-  <div class="score current">0</div>
+  <div class="score current">
+    0
+    <div class="delta">
+      <div class="value">0</div>
+      <button type="button" class="undo">
+        <img src="icons/icon-undo.svg">
+      </button>
+    </div>
+  </div>
 </div>
 <ul class="pagination">
+  <li data-active="true"></li>
 </ul>
 <div class="knob-container" data-hidden="true">
   <div class="delta-container">

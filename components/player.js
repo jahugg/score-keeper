@@ -48,10 +48,13 @@ class Player extends HTMLElement {
       }
     });
 
-    // hide/show the steppers
+    // hide/show the knob
     const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
     scoreHistoryEl.addEventListener('pointerup', (event) => {
-      // const steppersEl = this.shadowRoot.querySelector('.steppers');
+
+      // only proceed and show if the clicked item is the current score
+      if (!event.target.classList.contains('current')) return;
+
       const knobContainerEl = this.shadowRoot.querySelector('.knob-container');
       const isHidden = knobContainerEl.hasAttribute('data-hidden');
       if (isHidden)
@@ -62,6 +65,45 @@ class Player extends HTMLElement {
 
     // Add event listener for scroll to update pagination dots
     scoreHistoryEl.addEventListener('scroll', this.updatePaginationDots.bind(this), { passive: true });
+
+    // Add event listener for undo button
+    const undoEl = this.shadowRoot.querySelector('button.undo');
+    undoEl.addEventListener('pointerup', (event) => {
+      const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
+      const currentScoreEl = scoreHistoryEl.querySelector('.score.current');
+
+      if (!currentScoreEl) return; // Exit if no current score element exists
+
+      // Move the undo button element from the current score element to the delta element of the previous score
+      const undoEl = this.shadowRoot.querySelector('button.undo');
+      const previousScoreEl = currentScoreEl.previousElementSibling;
+      const previousDeltaEl = previousScoreEl.querySelector('.delta');
+      previousDeltaEl.appendChild(undoEl);
+
+      // Remove the current score element
+      scoreHistoryEl.removeChild(currentScoreEl);
+
+      // Update the score by subtracting the last delta
+      const deltaEl = currentScoreEl.querySelector('.delta .value');
+      if (deltaEl) {
+        const delta = parseInt(deltaEl.innerText, 10);
+        this._score -= delta;
+        this.shadowRoot.querySelector('.score').value = this._score;
+      }
+
+      // Set the last score element as the new current
+      const lastScoreEl = scoreHistoryEl.querySelector('.score:last-child');
+      if (lastScoreEl) {
+        lastScoreEl.classList.add('current');
+      }
+
+      // Remove the last pagination dot
+      const paginationContainerEl = this.shadowRoot.querySelector('.pagination');
+      const lastDot = paginationContainerEl.querySelector('li:last-child');
+      if (lastDot) {
+        paginationContainerEl.removeChild(lastDot);
+      }
+    });
   }
 
   connectedCallback() {
@@ -99,10 +141,17 @@ class Player extends HTMLElement {
     currentScoreEl.innerText = this._score;
     scoreHistoryEl.appendChild(currentScoreEl);
 
-    // add delta element to previous score
+    // add delta element to score
     const deltaEl = document.createElement('div');
     deltaEl.classList.add('delta');
-    deltaEl.innerText = delta > 0 ? `+${delta}` : `${delta}`;
+    const valueEl = document.createElement('div');
+    valueEl.classList.add('value');
+    valueEl.innerText = delta > 0 ? `+${delta}` : `${delta}`;
+    deltaEl.appendChild(valueEl);
+
+    const undoEl = this.shadowRoot.querySelector('button.undo')
+    deltaEl.appendChild(undoEl);
+
     currentScoreEl.appendChild(deltaEl);
 
     // Scroll to the bottom
@@ -111,16 +160,9 @@ class Player extends HTMLElement {
     // update pagination
     const paginationContainerEl = this.shadowRoot.querySelector('.pagination');
     const paginationDots = this.shadowRoot.querySelectorAll(".pagination li");
-
-    if (paginationDots.length === 0) {
-      // create additional pagination dot for first page
-      const paginationEl = document.createElement("li");
-      paginationContainerEl.appendChild(paginationEl);
-    } else {
-      // remove active attribute of all dots
-      for (const dot of paginationDots)
-        delete dot.dataset.active;
-    }
+    // remove active attribute of all dots
+    for (const dot of paginationDots)
+      delete dot.dataset.active;
 
     const paginationEl = document.createElement("li");
     paginationEl.dataset.active = "true";
@@ -288,7 +330,7 @@ class Player extends HTMLElement {
     knob.addEventListener('pointercancel', pointerUp);
   }
 
-  // Simplified function to update pagination dots
+  // Function to update pagination dots
   updatePaginationDots() {
     const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
     const scores = Array.from(scoreHistoryEl.querySelectorAll('.score'));
