@@ -4,15 +4,16 @@ class Player extends HTMLElement {
   static colorChroma = 0.1142;
   static colorHues = [0, 36, 72, 108, 144, 180, 216, 252, 288, 324];
 
+  // Private class fields
+  #name = '';
+  #colorHue = 0;
+  #score = 0;
+  #placeholderName = 'Player Name';
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.loadTemplate();
-
-    this._name = '';
-    this._colorHue = 0;
-    this._score = 0;
-    this._placeholderName = 'Player Name';
   }
 
   async loadTemplate() {
@@ -87,8 +88,8 @@ class Player extends HTMLElement {
       const deltaEl = currentScoreEl.querySelector('.delta .value');
       if (deltaEl) {
         const delta = parseInt(deltaEl.innerText, 10);
-        this._score -= delta;
-        this.shadowRoot.querySelector('.score').value = this._score;
+        this.#score -= delta;
+        this.shadowRoot.querySelector('.score').value = this.#score;
       }
 
       // Set the last score element as the new current
@@ -111,7 +112,7 @@ class Player extends HTMLElement {
   }
 
   cycleColor() {
-    const currentIndex = Player.colorHues.indexOf(Number(this._colorHue));
+    const currentIndex = Player.colorHues.indexOf(Number(this.#colorHue));
     // Calculate the next index, wrapping around to the start of the array if necessary
     const nextIndex = (currentIndex + 1) % Player.colorHues.length;
     this.colorHue = Player.colorHues[nextIndex];
@@ -121,11 +122,11 @@ class Player extends HTMLElement {
    * @param {number} value
    */
   set score(value) {
-    const delta = value - this._score;
-    this._score = value;
+    const delta = value - this.#score;
+    this.#score = value;
 
     const scoreHistoryEl = this.shadowRoot.querySelector('.score-history');
-    this.shadowRoot.querySelector('.score').value = this._score;
+    this.shadowRoot.querySelector('.score').value = this.#score;
 
     if (delta === 0) return; // Ignore zero values
 
@@ -138,7 +139,7 @@ class Player extends HTMLElement {
     // add current score element to history
     const currentScoreEl = document.createElement('div');
     currentScoreEl.classList.add('score', 'current');
-    currentScoreEl.innerText = this._score;
+    currentScoreEl.innerText = this.#score;
     scoreHistoryEl.appendChild(currentScoreEl);
 
     // add delta element to score
@@ -174,26 +175,26 @@ class Player extends HTMLElement {
    * @param {number} value
    */
   set colorHue(value) {
-    this._colorHue = value;
+    this.#colorHue = value;
     this.style.setProperty('--color-player-lightness', `${Player.colorLightness}%`); // Set the custom property --color-player
     this.style.setProperty('--color-player-chroma', Player.colorChroma); // Set the custom property --color-player
-    this.style.setProperty('--color-player-hue', this._colorHue); // Set the custom property --color-player
+    this.style.setProperty('--color-player-hue', this.#colorHue); // Set the custom property --color-player
   }
 
   /**
    * @param {string} value
    */
   set name(value) {
-    this._name = value;
-    this.shadowRoot.querySelector('.name').value = this._name;
+    this.#name = value;
+    this.shadowRoot.querySelector('.name').value = this.#name;
   }
 
   /**
    * @param {string} value
    */
   set placeholderName(value) {
-    this._placeholderName = value;
-    this.shadowRoot.querySelector('.name').placeholder = this._placeholderName;
+    this.#placeholderName = value;
+    this.shadowRoot.querySelector('.name').placeholder = this.#placeholderName;
   }
 
   handleKnobRotation() {
@@ -351,7 +352,7 @@ class Player extends HTMLElement {
   }
 
   adjustScore(delta) {
-    this.score = this._score + delta;
+    this.score = this.#score + delta;
   }
 
   restartAnimation(el, className) {
